@@ -20,6 +20,7 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 
 uniform float u_Time; 
+uniform float u_Gain; 
 
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
@@ -85,6 +86,18 @@ float perlinNoise( in vec3 x )
            u.x*u.y*u.z*(-va+vb+vc-vd+ve-vf-vg+vh);
 }
 
+float bias(float b, float t) {
+    return pow(t, log(b) / log(0.5f)); 
+}
+
+float gain(float g, float t) {
+    if (t < 0.5f) {
+        return bias(1. - g, 2.*t) / 2.; 
+    } else {
+        return 1. - bias(1.-g, 2. - 2.*t) / 2.; 
+    }
+}
+
 void main()
 {
     fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation
@@ -96,7 +109,22 @@ void main()
     float displacement = 0.1 * perlinNoise(2. * vs_Pos.xyz - vec3(0., time, 0.));
     fs_Displacement = displacement; 
 
-    vec4 vertex_Pos = vs_Pos + vs_Nor * displacement; 
+    vec4 vertex_pos = vs_Pos; 
+
+    // get that "tear drop" shape
+    vertex_pos.y = gain(vertex_pos.y, u_Gain);
+
+    vertex_pos.y *= 5.;
+    vertex_pos.y -= 3.;   
+    vertex_pos.xz *= 0.7; 
+
+    float wiggle = 0.1 * sin(vertex_pos.y * 7. + time);
+    wiggle = mix(0., wiggle, smoothstep(0.0, 1.3, vertex_pos.y)); 
+
+    vertex_pos.x += wiggle; 
+
+
+    vertex_pos += vs_Nor * displacement; 
 
     fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.
                                                             // Transform the geometry's normals by the inverse transpose of the
@@ -104,7 +132,7 @@ void main()
                                                             // perpendicular to the surface after the surface is transformed by
                                                             // the model matrix.
 
-    vec4 modelposition = u_Model * vertex_Pos;   // Temporarily store the transformed vertex positions for use below
+    vec4 modelposition = u_Model * vertex_pos;   // Temporarily store the transformed vertex positions for use below
 
     fs_Pos = modelposition; 
 

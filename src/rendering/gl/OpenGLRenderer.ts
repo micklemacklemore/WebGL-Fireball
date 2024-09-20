@@ -22,11 +22,11 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  render(camera: Camera, prog: ShaderProgram, drawables: Array<Drawable>, geoColor: number[], geoColor2: number[]) {
+  render(camera: Camera, prog: ShaderProgram, drawables: Array<Drawable>, controls: any) {
     let model = mat4.create();
     let viewProj = mat4.create();
-    let color = vec4.fromValues(geoColor[0]/255, geoColor[1]/255, geoColor[2]/255, geoColor[3]);
-    let color2 = vec4.fromValues(geoColor2[0]/255, geoColor2[1]/255, geoColor2[2]/255, geoColor2[3]);
+    let color = vec4.fromValues(controls.color[0]/255, controls.color[1]/255, controls.color[2]/255, controls.color[3]);
+    let color2 = vec4.fromValues(controls.color2[0]/255, controls.color2[1]/255, controls.color2[2]/255, controls.color2[3]);
 
     mat4.identity(model);
     mat4.multiply(viewProj, camera.projectionMatrix, camera.viewMatrix);
@@ -34,6 +34,7 @@ class OpenGLRenderer {
     prog.setViewProjMatrix(viewProj);
     prog.setGeometryColor(color);
     prog.setGeometryColor2(color2); 
+    prog.setGain(controls.gain); 
     prog.incrementTime(); 
 
     for (let drawable of drawables) {

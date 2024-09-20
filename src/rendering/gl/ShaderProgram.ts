@@ -27,12 +27,14 @@ class ShaderProgram {
 
   time: number; 
 
+
   unifModel: WebGLUniformLocation;
   unifModelInvTr: WebGLUniformLocation;
   unifViewProj: WebGLUniformLocation;
   unifColor: WebGLUniformLocation;
   unifColor2: WebGLUniformLocation; 
   unifTime: WebGLUniformLocation; 
+  unifGain: WebGLUniformLocation; 
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -57,6 +59,7 @@ class ShaderProgram {
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
     this.unifColor2      = gl.getUniformLocation(this.prog, "u_Color2");
     this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
+    this.unifGain       = gl.getUniformLocation(this.prog, "u_Gain"); 
   }
 
   use() {
@@ -106,6 +109,13 @@ class ShaderProgram {
     this.use();
     if (this.unifColor2 !== -1) {
       gl.uniform4fv(this.unifColor2, color);
+    }
+  }
+
+  setGain(t: number) {
+    this.use(); 
+    if (this.unifGain !== -1) {
+      gl.uniform1f(this.unifGain, t); 
     }
   }
 

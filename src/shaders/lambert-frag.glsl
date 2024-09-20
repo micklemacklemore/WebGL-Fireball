@@ -115,7 +115,7 @@ float remap(float value, float min1, float max1, float min2, float max2) {
 
 void main() {
      vec3 albedo = u_Color.xyz; 
-     albedo = mix(albedo, u_Color2.xyz, vec3(10. * fs_Displacement));  
+     albedo = mix(albedo, u_Color2.xyz, 1. - vec3(10. * fs_Displacement));  
 
      vec3 lightdir = normalize(vec3(3., 3., 0.)); 
      float dp = max(0.0, dot(fs_Nor.xyz, lightdir)); 
