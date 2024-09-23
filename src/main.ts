@@ -63,16 +63,23 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(2.0, 1.0, 2.0), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0.0, 0.0, 8.0), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
+  renderer.setClearColor(0.0, 0.0, 0.0, 1);
   gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   const lambert = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
+
+  const flat = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/flat-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/flat-frag.glsl'))]); 
 
   // This function will be called every frame
   function tick() {
@@ -80,19 +87,19 @@ function main() {
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
+
     if(controls.tesselations != prevTesselations)
     {
       prevTesselations = controls.tesselations;
       icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, prevTesselations);
       icosphere.create();
-      // square = new Square(vec3.fromValues(0, 0, 0)); 
-      // square.create(); 
     }
-    renderer.render(camera, lambert, [
-      icosphere,
-      //square,
-    ],
-    controls);
+
+    // 
+    renderer.render(camera, lambert, [icosphere], controls, false);
+    renderer.render(camera, flat, [square], controls, true); 
+    
+
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

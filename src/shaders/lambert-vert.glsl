@@ -98,6 +98,19 @@ float gain(float g, float t) {
     }
 }
 
+float fbm(vec3 p) {
+    float amplitude = 1.;
+    float frequency = 0.4;
+
+    float y = perlinNoise(p*frequency);
+    //y += perlinNoise(p*frequency*2.1)*4.5;
+    y += perlinNoise(p*frequency*20.1)*.2; 
+    
+    //y += perlinNoise(p*frequency*1.72)*4. 
+
+     return y; 
+}
+
 void main()
 {
     fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation
@@ -106,22 +119,11 @@ void main()
 
     float time = (u_Time * 0.03); 
 
-    float displacement = 0.1 * perlinNoise(2. * vs_Pos.xyz - vec3(0., time, 0.));
+    float displacement = 0.1 * fbm(2. * vs_Pos.xyz - vec3(0., time, 0.));
     fs_Displacement = displacement; 
 
     vec4 vertex_pos = vs_Pos; 
 
-    // get that "tear drop" shape
-    vertex_pos.y = gain(vertex_pos.y, u_Gain);
-
-    vertex_pos.y *= 5.;
-    vertex_pos.y -= 3.;   
-    vertex_pos.xz *= 0.7; 
-
-    float wiggle = 0.1 * sin(vertex_pos.y * 7. + time);
-    wiggle = mix(0., wiggle, smoothstep(0.0, 1.3, vertex_pos.y)); 
-
-    vertex_pos.x += wiggle; 
 
 
     vertex_pos += vs_Nor * displacement; 
