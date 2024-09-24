@@ -22,6 +22,8 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
 uniform float u_Time; 
 uniform float u_Gain; 
 
+uniform bool u_StopMotion; 
+
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
 in vec4 vs_Nor;             // The array of vertex normals passed to the shader
@@ -102,9 +104,8 @@ float fbm(vec3 p) {
     float amplitude = 1.;
     float frequency = 0.4;
 
-    float y = perlinNoise(p*frequency);
-    //y += perlinNoise(p*frequency*2.1)*4.5;
-    y += perlinNoise(p*frequency*20.1)*.2; 
+    float y = perlinNoise(p*frequency) * 1.2;
+    y += perlinNoise(p*frequency*20.1)*.3; 
     
     //y += perlinNoise(p*frequency*1.72)*4. 
 
@@ -117,15 +118,14 @@ void main()
 
     mat3 invTranspose = mat3(u_ModelInvTr);
 
-    float time = (u_Time * 0.03); 
-
+    float time = u_Time * 0.07;
+    if (u_StopMotion) {
+        time = floor(u_Time * 0.10);
+    }
+    //time = floor(u_Time * 0.3); 
     float displacement = 0.1 * fbm(2. * vs_Pos.xyz - vec3(0., time, 0.));
     fs_Displacement = displacement; 
-
     vec4 vertex_pos = vs_Pos; 
-
-
-
     vertex_pos += vs_Nor * displacement; 
 
     fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.
@@ -135,11 +135,11 @@ void main()
                                                             // the model matrix.
 
     vec4 modelposition = u_Model * vertex_pos;   // Temporarily store the transformed vertex positions for use below
-
     fs_Pos = modelposition; 
-
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
-    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
+    vec4 final_pos = u_ViewProj * modelposition; 
+
+    gl_Position = final_pos; // gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices
 }

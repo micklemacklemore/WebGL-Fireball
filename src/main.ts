@@ -16,7 +16,9 @@ const controls = {
   'Load Scene': loadScene, // A function pointer, essentially
   color: [255,40,40, 1.0],
   color2: [255,184,92, 1.],
-  gain: 0.58
+  gain: 0.58,
+  stop_motion: 0 ,
+  stars_speed: 1.
 };
 
 let icosphere: Icosphere;
@@ -49,6 +51,8 @@ function main() {
   gui.addColor(controls, 'color'); 
   gui.addColor(controls, 'color2'); 
   gui.add(controls, 'gain', 0.0, 1.0).step(0.01); 
+  gui.add(controls, 'stop_motion', 0, 1).step(1.); 
+  gui.add(controls, 'stars_speed', 1., 40).step(.1); 
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -81,6 +85,11 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/flat-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/flat-frag.glsl'))]); 
 
+  const bground = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/background-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/background-frag.glsl'))
+  ]);
+
   // This function will be called every frame
   function tick() {
     camera.update();
@@ -96,6 +105,7 @@ function main() {
     }
 
     // 
+    renderer.render(camera, bground, [square], controls, false); 
     renderer.render(camera, lambert, [icosphere], controls, false);
     renderer.render(camera, flat, [square], controls, true); 
     

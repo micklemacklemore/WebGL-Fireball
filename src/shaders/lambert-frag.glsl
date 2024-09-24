@@ -5,6 +5,7 @@ precision highp float;
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform vec4 u_Color2; 
 uniform float u_Time; 
+uniform float u_Gain;
 
 in vec4 fs_Nor;
 in vec4 fs_LightVec;
@@ -113,14 +114,21 @@ float remap(float value, float min1, float max1, float min2, float max2) {
   return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
 }
 
+float triangle_wave(float x, float freq, float amplitude) {
+     return abs(mod((x * freq), amplitude) - (0.5 * amplitude)); 
+}
+
 void main() {
      vec3 albedo = u_Color.xyz; 
-     albedo = mix(albedo, u_Color2.xyz, 1. - vec3(10. * fs_Displacement));  
+
+     vec3 displacementFactor = 1. - vec3(10. * fs_Displacement); 
+     displacementFactor.y = triangle_wave(displacementFactor.y, 15., 8.); 
+
+     albedo = mix(albedo, u_Color2.xyz, smoothstep(0., 10. * u_Gain, displacementFactor));  
 
      vec3 lightdir = normalize(vec3(3., 3., 0.)); 
-     
-     float dp = max(0.0, dot(fs_Nor.xyz, lightdir)); 
-     vec3 diffuse = dp * u_Color2.xyz; 
+
+     vec3 diffuse = u_Color2.xyz; 
 
      vec3 finalcolor = albedo * (diffuse + vec3(0.1)); 
      finalcolor = linearToSRGB(finalcolor);

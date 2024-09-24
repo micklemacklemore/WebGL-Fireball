@@ -5,12 +5,15 @@ uniform vec3 u_Eye, u_Ref, u_Up;
 uniform vec2 u_Dimensions;
 uniform float u_Time;
 
+uniform bool u_StopMotion; 
+
 in vec2 fs_Pos;
 out vec4 out_Col;
 
 #define PI 3.14159
 
 // -- below is shamelessly copied from https://www.shadertoy.com/view/MctXWS, check it out
+
 vec2 random2(vec2 st, float seed){
     st = vec2( dot(st,vec2(127.1,311.7)),
               dot(st,vec2(269.5,183.3)) );
@@ -86,8 +89,11 @@ void main() {
   }
 #endif
 
-float time = (u_Time * 0.01); 
+float time = u_Time * 0.01; 
 
+if (u_StopMotion) {
+  time = floor(u_Time * 0.12); 
+}
 
 vec2 uvScale = vec2(.5, .5);
 uv = (uv * 2. - 1.) * uvScale;
@@ -119,8 +125,7 @@ lightLength = step(lightLength, -.01);
 noise1d = mapStep(noise1d, .24, .77, .0, 2., 4.);
 noise1d *= pow(uvX, 4.);
 
-vec4 color = mix(vec4(0.), vec4(1., .33, .068, 1.) * noise1d * 4., lightLength);
-
+vec4 color = mix(vec4(0.), vec4(1., .37, .068, .3) * noise1d * 4., lightLength); 
 
 out_Col = color;
 }

@@ -35,6 +35,9 @@ class ShaderProgram {
   unifColor2: WebGLUniformLocation; 
   unifTime: WebGLUniformLocation; 
   unifGain: WebGLUniformLocation; 
+  unifResolution: WebGLUniformLocation; 
+  unifStarSpeed: WebGLUniformLocation; 
+  unifStopMotion: WebGLUniformLocation; 
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -60,6 +63,9 @@ class ShaderProgram {
     this.unifColor2      = gl.getUniformLocation(this.prog, "u_Color2");
     this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
     this.unifGain       = gl.getUniformLocation(this.prog, "u_Gain"); 
+    this.unifResolution = gl.getUniformLocation(this.prog, "u_Resolution"); 
+    this.unifStarSpeed = gl.getUniformLocation(this.prog, "u_StarSpeed"); 
+    this.unifStopMotion = gl.getUniformLocation(this.prog, "u_StopMotion"); 
   }
 
   use() {
@@ -117,6 +123,27 @@ class ShaderProgram {
     if (this.unifGain !== -1) {
       gl.uniform1f(this.unifGain, t); 
     }
+  }
+
+  setResolution(x: number, y: number) {
+    this.use(); 
+    if (this.unifResolution !== -1) {
+      gl.uniform2f(this.unifResolution, x, y); 
+    } 
+  }
+
+  setStarSpeed(s: number) {
+    this.use(); 
+    if (this.unifStarSpeed !== -1) {
+      gl.uniform1f(this.unifStarSpeed, s); 
+    } 
+  }
+
+  setStopMotion(s: number) {
+    this.use(); 
+    if (this.unifStopMotion !== -1) {
+      gl.uniform1i(this.unifStopMotion, s)
+    } 
   }
 
   draw(d: Drawable) {

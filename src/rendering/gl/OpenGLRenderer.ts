@@ -57,6 +57,9 @@ class OpenGLRenderer {
     prog.setGeometryColor(color);
     prog.setGeometryColor2(color2); 
     prog.setGain(controls.gain); 
+    prog.setResolution(this.canvas.width, this.canvas.height); 
+    prog.setStarSpeed(controls.stars_speed); 
+    prog.setStopMotion(controls.stop_motion); 
     prog.incrementTime(); 
 
     for (let drawable of drawables) {
