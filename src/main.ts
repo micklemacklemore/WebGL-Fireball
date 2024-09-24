@@ -52,7 +52,7 @@ function main() {
   gui.addColor(controls, 'color2'); 
   gui.add(controls, 'gain', 0.0, 1.0).step(0.01); 
   gui.add(controls, 'stop_motion', 0, 1).step(1.); 
-  gui.add(controls, 'stars_speed', 1., 40).step(.1); 
+  gui.add(controls, 'stars_speed', 0., 20).step(.1); 
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
